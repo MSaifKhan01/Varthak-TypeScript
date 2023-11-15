@@ -6,6 +6,8 @@ import dotenv from "dotenv"
 import UserRouter from "./Routes/userRoutes";
 import BookRouter from "./Routes/BookRouters";
 import { connecting } from "./Config/db";
+
+dotenv.config();
 const app=express()
 
 app.use(express.json())

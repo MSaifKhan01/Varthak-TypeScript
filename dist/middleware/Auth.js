@@ -4,35 +4,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.auth = void 0;
+const user_1 = require("../Models/user");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const auth = (requiredRoles) => {
-    return async (req, res, next) => {
-        const token = req.headers.authorization;
-        if (token) {
+const auth = async (req, res, next) => {
+    const token = req.headers?.authorization;
+    if (token) {
+        jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || '', async (err, decoded) => {
+            if (err) {
+                console.log(err);
+                return res.status(401).send({ msg: "Please log in again", err: err.message });
+            }
             try {
-                const decoded = await jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET || "");
-                if (decoded) {
-                    req.user = decoded;
-                    req.userRoles = decoded.roles || [];
-                    const hasRequiredRole = req.userRoles.some((role) => requiredRoles.includes(role));
-                    if (!hasRequiredRole) {
-                        return res.status(403).json({ message: 'Insufficient permissions' });
-                    }
-                    next();
+                const user = await user_1.UserModel.findById(decoded.user_id);
+                if (!user) {
+                    return res.status(401).send({ msg: "User not found" });
                 }
-                else {
-                    return res.status(401).send({ "msg": "Login again" });
-                }
+                req.body.user = user;
+                req.body.x_userRole = user.roles;
+                next();
             }
-            catch (error) {
-                return res.status(401).send({ "msg": "Invalid token" });
+            catch (err) {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
             }
-        }
-        else {
-            return res.status(404).send({ msg: "Login first" });
-        }
-    };
+        });
+    }
+    else {
+        res.status(401).send("Unauthorized: Please log in");
+    }
 };
 exports.auth = auth;

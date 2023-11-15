@@ -25,9 +25,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookModel = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-exports.BookModel = mongoose_1.default.model('Book', new mongoose_1.Schema({
+const bookSchema = new mongoose_1.default.Schema({
     title: String,
     author: String,
-    createdAt: Date,
-    //   createdBy: String,
-}));
+    createdBy: { type: mongoose_1.Schema.Types.ObjectId, ref: "User" },
+    createdAt: { type: Date, default: Date.now },
+}, { versionKey: false });
+const BookModel = mongoose_1.default.model("Book", bookSchema);
+exports.BookModel = BookModel;

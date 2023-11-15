@@ -11,5 +11,5 @@ export interface User extends Document {
 export const UserModel = mongoose.model<User>('User', new Schema({
   username: { type: String, unique: true, required: true },
   password: { type: String, required: true },
-  roles: { type: [String], default: [] },
+  roles: [{ type: String, enum: ["CREATOR", "VIEWER", "VIEW_ALL"], default: ["VIEWER"] }],
 }));

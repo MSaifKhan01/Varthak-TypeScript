@@ -1,39 +1,35 @@
-
-
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from "express";
+import { UserModel } from "../Models/user";
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 dotenv.config();
 
-
-export const auth = (requiredRoles: string[]) => {
-    return async (req: any, res: Response, next: NextFunction) => {
-      const token: string | undefined = req.headers.authorization;
+const auth = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers?.authorization
   
-      if (token) {
-        try {
-          const decoded: any = await jwt.verify(token, process.env.JWT_SECRET || "");
-  
-          if (decoded) {
-            req.user = decoded;
-            req.userRoles = decoded.roles || [];
-  
-            const hasRequiredRole = req.userRoles.some((role: string) => requiredRoles.includes(role));
-  
-            if (!hasRequiredRole) {
-              return res.status(403).json({ message: 'Insufficient permissions' });
-            }
-  
-            next();
-          } else {
-            return res.status(401).send({ "msg": "Login again" });
-          }
-        } catch (error) {
-          return res.status(401).send({ "msg": "Invalid token" });
-        }
-      } else {
-        return res.status(404).send({ msg: "Login first" });
+  if (token) {
+    jwt.verify(token, process.env.JWT_SECRET||'', async (err, decoded: any) => {
+      if (err) {
+        console.log(err);
+        return res.status(401).send({ msg: "Please log in again", err: err.message });
       }
-    };
-  };
-  
+
+      try {
+        const user = await UserModel.findById(decoded.user_id);
+        if (!user) {
+          return res.status(401).send({ msg: "User not found" });
+        }
+        req.body.user = user;
+        req.body.x_userRole = user.roles;
+        next();
+      } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal Server Error");
+      }
+    });
+  } else {
+    res.status(401).send("Unauthorized: Please log in");
+  }
+};
+
+export { auth };

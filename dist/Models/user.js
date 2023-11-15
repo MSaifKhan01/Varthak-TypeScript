@@ -28,5 +28,5 @@ const mongoose_1 = __importStar(require("mongoose"));
 exports.UserModel = mongoose_1.default.model('User', new mongoose_1.Schema({
     username: { type: String, unique: true, required: true },
     password: { type: String, required: true },
-    roles: { type: [String], default: [] },
+    roles: [{ type: String, enum: ["CREATOR", "VIEWER", "VIEW_ALL"], default: ["VIEWER"] }],
 }));

@@ -1,70 +1,57 @@
-// src/controllers/booksController.ts
 
 import { Request, Response } from 'express';
 import { BookModel } from '../Models/Books';
 
-export const createBook = async (req: Request, res: Response) => {
-  const { title, author } = req.body;
-
-
-try {
-  
-    const newBook = new BookModel({
-        title,
-        author,
-        createdAt: new Date(),
-        // createdBy: req.user.username,
-      });
-    
-      await newBook.save()
-
-    
-        res.status(201).json({ message: 'Book created successfully', newBook });
-  
-} catch (error: any) {
-    console.error(error)
-    return res.status(500).json({ msg: error.msg })
-}
-};
 
 
 
+// Create a book
 
-export const getBooks = (req: Request, res: Response) => {
-    const { old, new: isNew } = req.query;
+ 
+  export const createBook= async (req: Request, res: Response) => {
+    const { title, author } = req.body;
+    const createdBy = req.body.user._id;
+    const book = new BookModel({ title, author, createdBy });
+    try {
+      await book.save();
+      res.send({ msg: "Book added successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).send({ msg: "Internal Server Error" });
+    }
+  }
+
+
+// Get books
+
+ 
+
+ 
+  export const getBooks= async (req: Request, res: Response) => {
+    const { x_userRole } = req.body;
+    const { old, new: newBooks } = req.query;
     const query: any = {};
-    // console.log(req.userRoles)
-  
-    if (old === '1') {
+
+    if (old === "1") {
       query.createdAt = { $lte: new Date(Date.now() - 10 * 60 * 1000) };
-    } else if (isNew === '1') {
+    } else if (newBooks === "1") {
       query.createdAt = { $gt: new Date(Date.now() - 10 * 60 * 1000) };
     }
-  
-    // const userRoles = req.user?.roles ?? [];
-    
-    const userRoles=[""]
-  
-    if (userRoles.includes('VIEW_ALL')) {
-      BookModel.find(query, (err: any, books: any) => {
-        if (err) {
-          return res.status(500).json({ message: 'Internal Server Error' });
-        }
-  
-        res.status(200).json({ books });
-      });
-    } else if (userRoles.includes('VIEWER')) {
-    //   query.createdBy = req.user?.username;
-  
-      BookModel.find(query, (err: any, books: any) => {
-        if (err) {
-          return res.status(500).json({ message: 'Internal Server Error' });
-        }
-  
-        res.status(200).json({ books });
-      });
-    } else {
-      return res.status(403).json({ message: 'Forbidden' });
+
+    try {
+      if (x_userRole.includes("VIEW_ALL")) {
+        const books = await BookModel.find(query);
+        res.send(books);
+      } else if (x_userRole.includes("VIEWER")) {
+        const createdBy = req.body.user._id;
+        const books = await BookModel.find({ createdBy, ...query });
+        res.send(books);
+      } else {
+        res.send("You are not authorized to view books");
+      }
+    } catch (err) {
+      console.log(err);
+      res.status(500).send("Internal Server Error");
     }
-  };
-  
+  }
+
