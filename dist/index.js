@@ -14,8 +14,8 @@ const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 dotenv_1.default.config();
-app.get("/well", (req, res) => {
-    res.send({ "msg": "hello" });
+app.get("/", (req, res) => {
+    res.send({ "msg": "Wellcome" });
 });
 app.use("/user", userRoutes_1.default);
 app.use("/", BookRouters_1.default);

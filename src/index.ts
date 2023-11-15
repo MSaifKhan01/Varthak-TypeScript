@@ -17,8 +17,8 @@ app.use(cors())
 dotenv.config()
 
 
-app.get("/well",(req:Request,res:Response)=>{
-    res.send({"msg":"hello"})
+app.get("/",(req:Request,res:Response)=>{
+    res.send({"msg":"Wellcome"})
 })
 
 

@@ -1,4 +1,4 @@
-
+# Varthak API Documentation
 
 ## Base API URL
 
@@ -22,13 +22,12 @@
 
     ```bash
     cd Varthak-TypeScript
-
     npm install
     ```
 
 3. **Set environment variables:**
 
-   Create a `.env` file in the project  directory and add the following environment variables:
+   Create a `.env` file in the project directory and add the following environment variables:
 
     ```env
     url=<your-mongodb-connection-string>
@@ -51,20 +50,23 @@
 - **Method:** POST
 - **URL:** /register
 - **Description:** Create a new user account
-- **Request Body:**
+
+  **Request Body:**
   - username (string): User's username 
   - password (string): User's password
-  - roles (array): User roles (e.g., ["CREATOR", "VIEWER"])
+  - roles (array): User roles (e.g., ["CREATOR", "VIEWER","VIEW_ALL"])
 
 ### Log In
 
 - **Method:** POST
 - **URL:** /login
 - **Description:** Authenticate user and generate JWT token
-- **Request Body:**
+
+  **Request Body:**
   - username (string): User's username 
   - password (string): User's password
-- **Response:**
+
+  **Response:**
   - msg (string): Success message
   - token (string): JWT token
 
@@ -73,10 +75,12 @@
 - **Method:** GET
 - **URL:** /books
 - **Description:** Get a list of books based on user role
-- **Query Parameters:**
+
+  **Query Parameters:**
   - old (number, optional): Set to 1 to retrieve books created 10 minutes ago and older
   - new (number, optional): Set to 1 to retrieve books created less than 10 minutes ago
-- **Headers:**
+
+  **Headers:**
   - authorization (string): Bearer (JWT token)
 
   **Note:**
@@ -88,10 +92,11 @@
 - **Method:** POST
 - **URL:** /books
 - **Description:** Create a new book
-- **Request Body:**
+
+  **Request Body:**
   - title (string): Book title
   - author (string): Book author
-- **Headers:**
-  - authorization (string):(JWT token)
-  - Content-Type: application/json
 
+  **Headers:**
+  - authorization (string): (JWT token)
+  - Content-Type: application/json

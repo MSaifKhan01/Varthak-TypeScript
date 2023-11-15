@@ -38,7 +38,6 @@ const loginUser = async (req, res) => {
         bcrypt_1.default.compare(password, user.password, (err, result) => {
             if (result) {
                 const token = jsonwebtoken_1.default.sign({ user_id: user._id, role: user.roles }, process.env.JWT_SECRET || '', { expiresIn: "1h" });
-                // res.cookie("token", token, { httpOnly: true });
                 res.send({ msg: "Logged in succesfull", token });
             }
             else {
