@@ -40,7 +40,7 @@ import { UserModel } from '../Models/user';
             process.env.JWT_SECRET ||'',
             { expiresIn: "1h" }
           );
-          // res.cookie("token", token, { httpOnly: true });
+          
           res.send({ msg: "Logged in succesfull", token });
         } else {
           res.send("Invalid credentials");
